@@ -1,31 +1,96 @@
 # Rust Distributed Job Queue
 
-A correctness-first distributed job queue prototype exploring reliable background work in Rust.
+## 📖 About
 
-## Implemented
+A correctness-first distributed job-queue prototype exploring reliable background work, worker ownership, retries, leases, acknowledgements, and failure semantics in Rust.
 
-- unique job IDs
-- worker leases
-- acknowledgement ownership
-- retry accounting
-- configurable maximum attempts
-- dead-letter handling
-- deterministic unit tests
+## ✨ Features
 
-## Reliability model
+- Unique job IDs
+- Worker leases
+- Acknowledgement ownership
+- Retry accounting
+- Maximum-attempt policy
+- Dead-letter handling
+- Deterministic unit tests
 
-A worker does not own a job merely because it fetched it. The queue records the lease owner and only that worker can acknowledge or reject the lease. Failed jobs are requeued until their attempt budget is exhausted, after which they enter the dead-letter queue.
+## 🛠 Tech Stack
 
-The current core is deliberately in-memory. Next stages are durable persistence, lease expiry, atomic claim operations, a network protocol, multiple workers, metrics/tracing and fault-injection tests.
+- Rust
+- Cargo
+- In-memory queue core
 
-## Run
+## 🏗 Architecture
+
+```text
+Producer
+   ↓
+Job queue
+   ↓
+Lease / ownership
+   ↓
+Worker
+   ├── acknowledge → completed
+   └── reject/fail → retry → dead letter
+```
+
+## 📁 Project Structure
+
+```text
+.
+├── src/        # Queue implementation
+├── tests/      # Correctness/failure tests
+├── Cargo.toml
+└── README.md
+```
+
+## 📋 Prerequisites
+
+- Rust stable toolchain
+
+## 🚀 Getting Started
 
 ```bash
+git clone https://github.com/matinwgg/rust-distributed-job-queue.git
+cd rust-distributed-job-queue
 cargo test
 ```
 
-## Engineering questions
+## 💻 Usage
 
-1. What failure semantics can be guaranteed when a worker crashes after completing work but before acknowledgement?
-2. How should lease expiry interact with duplicate delivery and idempotent handlers?
-3. What throughput/latency trade-offs arise from durable state and stronger consistency?
+The current core is an in-memory library. Integrate a producer and worker through the queue API exposed under `src/`.
+
+## 🧮 Mathematical / Systems Foundations
+
+Important concepts include state machines, invariants, leases, partial failure, probability of duplicate execution, queueing behavior, idempotency, and consistency semantics.
+
+## 🧪 Testing
+
+Tests should cover worker crashes, duplicate delivery, expired leases, acknowledgement races, retry budgets, and dead-letter transitions.
+
+## 🔐 Reliability & Security
+
+A job being fetched does not imply durable ownership. Production use requires durable persistence, atomic claim operations, authentication, authorization, input validation, bounded payloads, and observability.
+
+## 🚧 Future Work
+
+- Durable persistence
+- Lease expiry
+- Atomic claims
+- Network protocol
+- Multiple workers/nodes
+- Metrics/tracing
+- Fault injection
+- Idempotency support
+
+## 🤝 Contributing
+
+Document the failure semantics of every change and add deterministic tests for races and crash scenarios.
+
+## 📄 License
+
+See repository license information.
+
+## 👨‍💻 Author
+
+**Matin Odoom**
